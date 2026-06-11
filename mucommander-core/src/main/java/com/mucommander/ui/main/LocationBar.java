@@ -31,6 +31,8 @@ import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * A wrapper panel that sits in place of the location text field in each FolderPanel.
@@ -53,7 +55,8 @@ import java.awt.event.MouseEvent;
  * in both panels. The breadcrumb dynamically follows the mouse - if the user moves the mouse
  * from one panel to another while still holding Ctrl, the breadcrumb switches accordingly.
  * The breadcrumb is immediately hidden when Ctrl is released, or if any other key is pressed
- * or the mouse is clicked before the delay expires.
+ * or the mouse is clicked before the delay expires. It is also hidden if the window loses
+ * focus while Ctrl/Meta is held, since no key-released event is delivered in that case.
  */
 public class LocationBar extends JPanel {
 
@@ -153,6 +156,18 @@ public class LocationBar extends JPanel {
                 }
             }
             return false; // never consume — other Ctrl shortcuts must keep working
+        });
+
+        // If the window loses focus while Ctrl/Meta is held (e.g. Alt-Tab), no
+        // KEY_RELEASED event is ever delivered to this app, so fall back to hiding
+        // the breadcrumb here.
+        folderPanel.getMainFrame().getJFrame().addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                cancelBreadcrumbTimer();
+                modifierHeld = false;
+                cardLayout.show(LocationBar.this, CARD_TEXT_FIELD);
+            }
         });
     }
 
