@@ -17,6 +17,9 @@
 
 package com.mucommander.ui.main;
 
+import com.mucommander.ui.event.LocationEvent;
+import com.mucommander.ui.event.LocationListener;
+
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -73,6 +76,14 @@ public class LocationBar extends JPanel {
 
     /** Timer that delays showing the breadcrumb to avoid noise from quick keyboard shortcuts */
     private final Timer showBreadcrumbTimer;
+
+    /**
+     * Refreshes the breadcrumb when the location changes while it is shown.
+     * Held as a field because {@link com.mucommander.ui.event.LocationManager} stores
+     * listeners in a {@link java.util.WeakHashMap} - an unreferenced anonymous/lambda
+     * listener would be garbage collected almost immediately.
+     */
+    private final LocationListener breadcrumbLocationListener;
 
     /** Tracks whether Ctrl/Meta is currently being held down */
     private boolean modifierHeld;
@@ -157,6 +168,18 @@ public class LocationBar extends JPanel {
             }
             return false; // never consume — other Ctrl shortcuts must keep working
         });
+
+        // Keep the breadcrumb in sync if the location changes while it is being shown
+        // (e.g. navigating via a quick-list or shortcut while Ctrl/Meta is held).
+        breadcrumbLocationListener = new LocationListener() {
+            @Override
+            public void locationChanged(LocationEvent locationEvent) {
+                if (breadcrumbBar.isShowing()) {
+                    breadcrumbBar.setFile(folderPanel.getCurrentFolder());
+                }
+            }
+        };
+        folderPanel.getLocationManager().addLocationListener(breadcrumbLocationListener);
 
         // If the window loses focus while Ctrl/Meta is held (e.g. Alt-Tab), no
         // KEY_RELEASED event is ever delivered to this app, so fall back to hiding
