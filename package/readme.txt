@@ -39,6 +39,7 @@ New features:
 
 Improvements:
 - Terminal: Font and color updates now apply instantly.
+- Support zip64 files (zip files larger than 4gb).
 
 Localization:
 -
