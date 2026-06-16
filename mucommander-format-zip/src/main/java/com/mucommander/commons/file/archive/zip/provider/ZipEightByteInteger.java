@@ -28,7 +28,7 @@ package com.mucommander.commons.file.archive.zip.provider;
  * code has been modified under the terms of the Apache License which you can find in the bundled muCommander license
  * file.</p>
  *
- * @author Apache Ant, Maxence Bernard
+ * @author Apache Ant
  */
 public final class ZipEightByteInteger implements Cloneable {
 
