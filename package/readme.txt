@@ -45,7 +45,8 @@ Localization:
 -
 
 Bug fixes:
--
+- Hide the breadcrumbs component when navigating away from application window while holding down the ctrl/cmd key.
+- Dynamically update the path displayed in the breadcrumbs component in case the current path changes while its displayed.
 
 Known issues:
 - Some translations may not be up-to-date.
